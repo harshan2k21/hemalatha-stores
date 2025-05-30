@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemalatha Stores - Grocery Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+            <h1 id="title" class="text-2xl font-bold text-center text-blue-600">Hemalatha Stores</h1>
+            <select id="language" onchange="changeLanguage()" class="p-2 border rounded">
+                <option value="en">English</option>
+                <option value="ta">தமிழ்</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label id="productLabel" class="block text-gray-700">Select Product</label>
+            <select id="product" class="w-full p-2 border rounded">
+                <option value="cashew">Cashew (₹840/kg) / முந்திரி (₹840/கிலோ)</option>
+                <option value="dry_grapes">Dry Grapes (₹350/kg) / உலர் திராட்சை (₹350/கிலோ)</option>
+                <option value="cardamom">Cardamom (₹3400/kg) / ஏலக்காய் (₹3400/கிலோ)</option>
+                <option value="cinnamon">Cinnamon (₹300/kg) / இலவங்கப்பட்டை (₹300/கிலோ)</option>
+                <option value="cloves">Cloves (₹1000/kg) / கிராம்பு (₹1000/கிலோ)</option>
+                <option value="star_anise">Star Anise (₹800/kg) / நட்சத்திர சோம்பு (₹800/கிலோ)</option>
+                <option value="fennel_seeds">Fennel Seeds (₹180/kg) / சோம்பு (₹180/கிலோ)</option>
+                <option value="cumin">Cumin (₹340/kg) / சீரகம் (₹340/கிலோ)</option>
+                <option value="poppy_seeds">Poppy Seeds (₹1400/kg) / கசகசா (₹1400/கிலோ)</option>
+                <option value="ajwain_seeds">Ajwain Seeds (₹300/kg) / ஓமம் (₹300/கிலோ)</option>
+                <option value="fenugreek">Fenugreek (₹95/kg) / வெந்தயம் (₹95/கிலோ)</option>
+                <option value="kapok_buds">Kapok Buds (₹500/kg) / மருதாணி பூ (₹500/கிலோ)</option>
+                <option value="kalpasi">Kalpasi (₹800/kg) / கற்பாசி (₹800/கிலோ)</option>
+                <option value="mace">Mace (₹2000/kg) / ஜாதிபத்திரி (₹2000/கிலோ)</option>
+                <option value="bay_leaf">Bay Leaf (₹200/kg) / பிரியாணி இலை (₹200/கிலோ)</option>
+            </select>
+        </div>
+        <div class="mb-4">
+            <label id="budgetLabel" class="block text-gray-700">Customer Budget (₹)</label>
+            <input type="number" id="budget" placeholder="Enter budget (e.g., 100)" class="w-full p-2 border rounded">
+        </div>
+        <div class="mb-4">
+            <label id="quantityLabel" class="block text-gray-700">Requested Quantity (grams)</label>
+            <input type="number" id="quantity" placeholder="Enter quantity (e.g., 50)" class="w-full p-2 border rounded">
+        </div>
+        <button onclick="calculate()" id="calculateButton" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calculate</button>
+        <div id="result" class="mt-4 text-center"></div>
+    </div>
+    <script>
+        // Product data: price per kg
+        const products = {
+            cashew: { pricePerKg: 840 },
+            dry_grapes: { pricePerKg: 350 },
+            cardamom: { pricePerKg: 3400 },
+            cinnamon: { pricePerKg: 300 },
+            cloves: { pricePerKg: 1000 },
+            star_anise: { pricePerKg: 800 },
+            fennel_seeds: { pricePerKg: 180 },
+            cumin: { pricePerKg: 340 },
+            poppy_seeds: { pricePerKg: 1400 },
+            ajwain_seeds: { pricePerKg: 300 },
+            fenugreek: { pricePerKg: 95 },
+            kapok_buds: { pricePerKg: 500 },
+            kalpasi: { pricePerKg: 800 },
+            mace: { pricePerKg: 2000 },
+            bay_leaf: { pricePerKg: 200 }
+        };
+
+        // Language translations
+        const translations = {
+            en: {
+                title: "Hemalatha Stores",
+                productLabel: "Select Product",
+                budgetLabel: "Customer Budget (₹)",
+                quantityLabel: "Requested Quantity (grams)",
+                calculateButton: "Calculate",
+                budgetPlaceholder: "Enter budget (e.g., 100)",
+                quantityPlaceholder: "Enter quantity (e.g., 50)",
+                resultBudget: (grams, product, budget) => `Give ${grams} grams of ${product} for ₹${budget}`,
+                resultQuantity: (price, quantity, product) => `Charge ₹${price} for ${quantity} grams of ${product}`,
+                error: "Please enter either a budget or a quantity."
+            },
+            ta: {
+                title: "ஹேமலதா ஸ்டோர்ஸ்",
+                productLabel: "பொருளைத் தேர்ந்தெடு",
+                budgetLabel: "வாடிக்கையாளர் பட்ஜெட் (₹)",
+                quantityLabel: "கோரப்பட்ட அளவு (கிராம்)",
+                calculateButton: "கணக்கிடு",
+                budgetPlaceholder: "பட்ஜெட்டை உள்ளிடவும் (எ.கா., 100)",
+                quantityPlaceholder: "அளவை உள்ளிடவும் (எ.கா., 50)",
+                resultBudget: (grams, product, budget) => `${budget} ரூபாய்க்கு ${grams} கிராம் ${product} கொடு`,
+                resultQuantity: (price, quantity, product) => `${quantity} கிராம் ${product} க்கு ₹${price} வசூலிக்கவும்`,
+                error: "பட்ஜெட் அல்லது அளவு ஒன்றை உள்ளிடவும்."
+            }
+        };
+
+        // Product names in Tamil and English
+        const productNames = {
+            cashew: { en: "cashew", ta: "முந்திரி" },
+            dry_grapes: { en: "dry grapes", ta: "உலர் திராட்சை" },
+            cardamom: { en: "cardamom", ta: "ஏலக்காய்" },
+            cinnamon: { en: "cinnamon", ta: "இலவங்கப்பட்டை" },
+            cloves: { en: "cloves", ta: "கிராம்பு" },
+            star_anise: { en: "star anise", ta: "நட்சத்திர சோம்பு" },
+            fennel_seeds: { en: "fennel seeds", ta: "சோம்பு" },
+            cumin: { en: "cumin", ta: "சீரகம்" },
+            poppy_seeds: { en: "poppy seeds", ta: "கசகசா" },
+            ajwain_seeds: { en: "ajwain seeds", ta: "ஓமம்" },
+            fenugreek: { en: "fenugreek", ta: "ெவந்தயம்" },
+            kapok_buds: { en: "kapok buds", ta: "மருதாணி பூ" },
+            kalpasi: { en: "kalpasi", ta: "கற்பாசி" },
+            mace: { en: "mace", ta: "ஜாதிபத்திரி" },
+            bay_leaf: { en: "bay leaf", ta: "இலை" }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('language').value;
+            document.getElementById('title').innerText = translations[lang].title;
+            document.getElementById('productLabel').innerText = translations[lang].productLabel;
+            document.getElementById('budgetLabel').innerText = translations[lang].budgetLabel;
+            document.getElementById('quantityLabel').innerText = translations[lang].quantityLabel;
+            document.getElementById('calculateButton').innerText = translations[lang].calculateButton;
+            document.getElementById('budget').placeholder = translations[lang].budgetPlaceholder;
+            document.getElementById('quantity').placeholder = translations[lang].quantityPlaceholder;
+            document.getElementById('result').innerText = '';
+        }
+
+        function calculate() {
+            const lang = document.getElementById('language').value;
+            const product = document.getElementById('product').value;
+            const budget = parseFloat(document.getElementById('budget').value);
+            const quantity = parseFloat(document.getElementById('quantity').value);
+            const resultDiv = document.getElementById('result');
+            const pricePerGram = products[product].pricePerKg / 1000;
+            const productName = productNames[product][lang];
+
+            if (budget && !quantity) {
+                const grams = (budget / pricePerGram).toFixed(2);
+                resultDiv.innerHTML = translations[lang].resultBudget(grams, productName, budget);
+            } else if (quantity && !budget) {
+                const price = (quantity * pricePerGram).toFixed(2);
+                resultDiv.innerHTML = translations[lang].resultQuantity(price, quantity, productName);
+            } else {
+                resultDiv.innerHTML = translations[lang].error;
+            }
+        }
+
+        // Initialize with English
+        changeLanguage();
+    </script>
+</body>
+</html>
